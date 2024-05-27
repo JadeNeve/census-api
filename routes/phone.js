@@ -53004,20 +53004,89 @@ const ElderShip = [
     }
   ];
 
-router.get("/phone", (req, res) => {
-  res.send(phoneData);
-});
-
 // Single proudct parameter
 
-router.get("/phone/:id", (req, res) => {
-  const phoneId = parseInt(req.params.id);
-  const singlePhone = ElderShip.find((item) => item.id === phoneId);
+router.get('/elders', (req, res) => {
+  res.send(ElderShip);
+});
 
-  if (!phoneId) {
-    return res.status(404).json({ message: "Single Phone data was not found" });
+router.get('/elders/:id', (req, res) => {
+  const elderId = parseInt(req.params.id);
+  const singleElder = ElderShip.find(elder => elder.id === elderId);
+
+  if (!singleElder) {
+    return res.status(404).json({ message: "Elder data was not found" });
   }
-  res.json(singlePhone);
+  res.json(singleElder);
+});
+
+router.get('/elders/:id/priests/:prstAdminSortName', (req, res) => {
+  const elderId = parseInt(req.params.id);
+  const prstAdminSortName = req.params.prstAdminSortName;
+
+  const elder = ElderShip.find(elder => elder.id === elderId);
+  if (!elder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
+
+  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+  if (!priest) {
+    return res.status(404).json({ message: "Priest data was not found" });
+  }
+
+  res.json(priest);
+});
+
+router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName', (req, res) => {
+  const elderId = parseInt(req.params.id);
+  const prstAdminSortName = req.params.prstAdminSortName;
+  const familyName = req.params.familyName;
+
+  const elder = ElderShip.find(elder => elder.id === elderId);
+  if (!elder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
+
+  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+  if (!priest) {
+    return res.status(404).json({ message: "Priest data was not found" });
+  }
+
+  const family = priest.families.find(family => family.name === familyName);
+  if (!family) {
+    return res.status(404).json({ message: "Family data was not found" });
+  }
+
+  res.json(family);
+});
+
+router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:memberId', (req, res) => {
+  const elderId = parseInt(req.params.id);
+  const prstAdminSortName = req.params.prstAdminSortName;
+  const familyName = req.params.familyName;
+  const memberId = req.params.memberId;
+
+  const elder = ElderShip.find(elder => elder.id === elderId);
+  if (!elder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
+
+  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+  if (!priest) {
+    return res.status(404).json({ message: "Priest data was not found" });
+  }
+
+  const family = priest.families.find(family => family.name === familyName);
+  if (!family) {
+    return res.status(404).json({ message: "Family data was not found" });
+  }
+
+  const member = family.members.find(member => member.IDNO === memberId);
+  if (!member) {
+    return res.status(404).json({ message: "Member data was not found" });
+  }
+
+  res.json(member);
 });
 
 module.exports = router;
