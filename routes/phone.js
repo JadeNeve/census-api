@@ -53060,11 +53060,11 @@ router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName', (req, 
   res.json(family);
 });
 
-router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:memberId', (req, res) => {
+router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID', (req, res) => {
   const elderId = parseInt(req.params.id);
   const prstAdminSortName = req.params.prstAdminSortName;
   const familyName = req.params.familyName;
-  const memberId = req.params.memberId;
+  const UID = req.params.UID;
 
   const elder = ElderShip.find(elder => elder.id === elderId);
   if (!elder) {
@@ -53081,7 +53081,7 @@ router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName/members/
     return res.status(404).json({ message: "Family data was not found" });
   }
 
-  const member = family.members.find(member => member.IDNO === memberId);
+  const member = family.members.find(member => member.UID === UID);
   if (!member) {
     return res.status(404).json({ message: "Member data was not found" });
   }
