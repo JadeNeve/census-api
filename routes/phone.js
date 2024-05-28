@@ -1,5 +1,8 @@
 const expess = require("express");
-const router = expess.Router();
+const fs = require('fs');
+const path = require('path');
+const app = express();
+const router = express.Router();
 
 const ElderShip = [
       {
@@ -57135,125 +57138,151 @@ const ElderShip = [
   ]
 
 // Get all elders
+// Function to save data to the file
+function saveData(data) {
+  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+}
+
+// Load initial data from the file if it exists
+if (fs.existsSync(dataFilePath)) {
+  const rawData = fs.readFileSync(dataFilePath);
+  const parsedData = JSON.parse(rawData);
+  ElderShip.length = 0;
+  parsedData.forEach(elder => ElderShip.push(elder));
+} else {
+  // Save initial data to the file
+  saveData(ElderShip);
+}
+
+app.use('/api', router);
+
+// Get all elders
 router.get('/elders', (req, res) => {
-    res.send(ElderShip);
+  res.send(ElderShip);
 });
 
 // Get a specific elder by ID
 router.get('/elders/:id', (req, res) => {
-    const elderId = parseInt(req.params.id);
-    const singleElder = ElderShip.find(elder => elder.id === elderId);
+  const elderId = parseInt(req.params.id);
+  const singleElder = ElderShip.find(elder => elder.id === elderId);
 
-    if (!singleElder) {
-        return res.status(404).json({ message: "Elder data was not found" });
-    }
-    res.json(singleElder);
+  if (!singleElder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
+  res.json(singleElder);
 });
 
 // Get a specific priest by elder ID and priest admin sort name
 router.get('/elders/:id/priests/:prstAdminSortName', (req, res) => {
-    const elderId = parseInt(req.params.id);
-    const prstAdminSortName = req.params.prstAdminSortName;
+  const elderId = parseInt(req.params.id);
+  const prstAdminSortName = req.params.prstAdminSortName;
 
-    const elder = ElderShip.find(elder => elder.id === elderId);
-    if (!elder) {
-        return res.status(404).json({ message: "Elder data was not found" });
-    }
+  const elder = ElderShip.find(elder => elder.id === elderId);
+  if (!elder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
 
-    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
-    if (!priest) {
-        return res.status(404).json({ message: "Priest data was not found" });
-    }
+  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+  if (!priest) {
+    return res.status(404).json({ message: "Priest data was not found" });
+  }
 
-    res.json(priest);
+  res.json(priest);
 });
 
 // Get a specific family by elder ID, priest admin sort name, and family name
 router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName', (req, res) => {
-    const elderId = parseInt(req.params.id);
-    const prstAdminSortName = req.params.prstAdminSortName;
-    const familyName = req.params.familyName;
+  const elderId = parseInt(req.params.id);
+  const prstAdminSortName = req.params.prstAdminSortName;
+  const familyName = req.params.familyName;
 
-    const elder = ElderShip.find(elder => elder.id === elderId);
-    if (!elder) {
-        return res.status(404).json({ message: "Elder data was not found" });
-    }
+  const elder = ElderShip.find(elder => elder.id === elderId);
+  if (!elder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
 
-    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
-    if (!priest) {
-        return res.status(404).json({ message: "Priest data was not found" });
-    }
+  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+  if (!priest) {
+    return res.status(404).json({ message: "Priest data was not found" });
+  }
 
-    const family = priest.families.find(family => family.name === familyName);
-    if (!family) {
-        return res.status(404).json({ message: "Family data was not found" });
-    }
+  const family = priest.families.find(family => family.name === familyName);
+  if (!family) {
+    return res.status(404).json({ message: "Family data was not found" });
+  }
 
-    res.json(family);
+  res.json(family);
 });
 
 // Get a specific member by elder ID, priest admin sort name, family name, and member UID
 router.get('/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID', (req, res) => {
-    const elderId = parseInt(req.params.id);
-    const prstAdminSortName = req.params.prstAdminSortName;
-    const familyName = req.params.familyName;
-    const UID = req.params.UID;
+  const elderId = parseInt(req.params.id);
+  const prstAdminSortName = req.params.prstAdminSortName;
+  const familyName = req.params.familyName;
+  const UID = req.params.UID;
 
-    const elder = ElderShip.find(elder => elder.id === elderId);
-    if (!elder) {
-        return res.status(404).json({ message: "Elder data was not found" });
-    }
+  const elder = ElderShip.find(elder => elder.id === elderId);
+  if (!elder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
 
-    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
-    if (!priest) {
-        return res.status(404).json({ message: "Priest data was not found" });
-    }
+  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+  if (!priest) {
+    return res.status(404).json({ message: "Priest data was not found" });
+  }
 
-    const family = priest.families.find(family => family.name === familyName);
-    if (!family) {
-        return res.status(404).json({ message: "Family data was not found" });
-    }
+  const family = priest.families.find(family => family.name === familyName);
+  if (!family) {
+    return res.status(404).json({ message: "Family data was not found" });
+  }
 
-    const member = family.members.find(member => member.UID === UID);
-    if (!member) {
-        return res.status(404).json({ message: "Member data was not found" });
-    }
+  const member = family.members.find(member => member.UID === UID);
+  if (!member) {
+    return res.status(404).json({ message: "Member data was not found" });
+  }
 
-    res.json(member);
+  res.json(member);
 });
 
 // Update a specific member's data
 router.put('/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID', (req, res) => {
-    const elderId = parseInt(req.params.id);
-    const prstAdminSortName = req.params.prstAdminSortName;
-    const familyName = req.params.familyName;
-    const UID = req.params.UID;
-    const updatedData = req.body;
+  const elderId = parseInt(req.params.id);
+  const prstAdminSortName = req.params.prstAdminSortName;
+  const familyName = req.params.familyName;
+  const UID = req.params.UID;
+  const updatedData = req.body;
 
-    const elder = ElderShip.find(elder => elder.id === elderId);
-    if (!elder) {
-        return res.status(404).json({ message: "Elder data was not found" });
-    }
+  const elder = ElderShip.find(elder => elder.id === elderId);
+  if (!elder) {
+    return res.status(404).json({ message: "Elder data was not found" });
+  }
 
-    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
-    if (!priest) {
-        return res.status(404).json({ message: "Priest data was not found" });
-    }
+  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+  if (!priest) {
+    return res.status(404).json({ message: "Priest data was not found" });
+  }
 
-    const family = priest.families.find(family => family.name === familyName);
-    if (!family) {
-        return res.status(404).json({ message: "Family data was not found" });
-    }
+  const family = priest.families.find(family => family.name === familyName);
+  if (!family) {
+    return res.status(404).json({ message: "Family data was not found" });
+  }
 
-    const member = family.members.find(member => member.UID === UID);
-    if (!member) {
-        return res.status(404).json({ message: "Member data was not found" });
-    }
+  const member = family.members.find(member => member.UID === UID);
+  if (!member) {
+    return res.status(404).json({ message: "Member data was not found" });
+  }
 
-    // Update the member data
-    Object.assign(member, updatedData);
+  // Update the member data
+  Object.assign(member, updatedData);
 
-    res.json(member);
+  // Save the updated data back to the file
+  saveData(ElderShip);
+
+  res.json(member);
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
 });
 
 module.exports = router;
