@@ -1,8 +1,14 @@
-const expess = require("express");
+const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
 const router = express.Router();
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Path to the data file
+const dataFilePath = path.join(__dirname, 'data.json');
 
 const ElderShip = [
       {
@@ -57137,16 +57143,14 @@ const ElderShip = [
       }
   ]
 
-// Get all elders
-// Function to save data to the file
 function saveData(data) {
-  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+  fs.writeFileSync(dataFilePath, JSON.stringify({ ElderShip: data }, null, 2));
 }
 
 // Load initial data from the file if it exists
 if (fs.existsSync(dataFilePath)) {
   const rawData = fs.readFileSync(dataFilePath);
-  const parsedData = JSON.parse(rawData);
+  const parsedData = JSON.parse(rawData).ElderShip;
   ElderShip.length = 0;
   parsedData.forEach(elder => ElderShip.push(elder));
 } else {
