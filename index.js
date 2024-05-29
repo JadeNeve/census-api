@@ -11,22 +11,32 @@ const dataFilePath = path.join(__dirname, 'data.json');
 
 // Function to read data from the file
 function readData() {
-  const rawData = fs.readFileSync(dataFilePath);
-  return JSON.parse(rawData);
+  try {
+    const rawData = fs.readFileSync(dataFilePath);
+    return JSON.parse(rawData);
+  } catch (error) {
+    console.error("Error reading data from file:", error);
+    throw error;
+  }
 }
 
 // Function to save data to the file
 function saveData(data) {
-  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error("Error writing data to file:", error);
+    throw error;
+  }
 }
 
 let { ElderShip } = readData();
 
-app.get("/api/elders", (req, res) => {
+app.get("/elders", (req, res) => {
   res.json(ElderShip);
 });
 
-app.get("/api/elders/:id", (req, res) => {
+app.get("/elders/:id", (req, res) => {
   const elderId = parseInt(req.params.id);
   const singleElder = ElderShip.find(elder => elder.id === elderId);
   if (!singleElder) {
@@ -35,7 +45,7 @@ app.get("/api/elders/:id", (req, res) => {
   res.json(singleElder);
 });
 
-app.get("/api/elders/:id/priests/:prstAdminSortName", (req, res) => {
+app.get("/elders/:id/priests/:prstAdminSortName", (req, res) => {
   const elderId = parseInt(req.params.id);
   const prstAdminSortName = req.params.prstAdminSortName;
   const elder = ElderShip.find(elder => elder.id === elderId);
@@ -49,7 +59,7 @@ app.get("/api/elders/:id/priests/:prstAdminSortName", (req, res) => {
   res.json(priest);
 });
 
-app.get("/api/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res) => {
+app.get("/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res) => {
   const elderId = parseInt(req.params.id);
   const prstAdminSortName = req.params.prstAdminSortName;
   const familyName = req.params.familyName;
@@ -68,7 +78,7 @@ app.get("/api/elders/:id/priests/:prstAdminSortName/families/:familyName", (req,
   res.json(family);
 });
 
-app.get("/api/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
+app.get("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
   const elderId = parseInt(req.params.id);
   const prstAdminSortName = req.params.prstAdminSortName;
   const familyName = req.params.familyName;
@@ -92,7 +102,7 @@ app.get("/api/elders/:id/priests/:prstAdminSortName/families/:familyName/members
   res.json(member);
 });
 
-app.put("/api/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
+app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
   try {
     const elderId = parseInt(req.params.id);
     const prstAdminSortName = req.params.prstAdminSortName;
