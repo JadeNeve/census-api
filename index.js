@@ -22,11 +22,11 @@ function saveData(data) {
 
 let { ElderShip } = readData();
 
-app.get("/elders", (req, res) => {
+app.get("/api/elders", (req, res) => {
   res.json(ElderShip);
 });
 
-app.get("/elders/:id", (req, res) => {
+app.get("/api/elders/:id", (req, res) => {
   const elderId = parseInt(req.params.id);
   const singleElder = ElderShip.find(elder => elder.id === elderId);
   if (!singleElder) {
@@ -35,7 +35,7 @@ app.get("/elders/:id", (req, res) => {
   res.json(singleElder);
 });
 
-app.get("/elders/:id/priests/:prstAdminSortName", (req, res) => {
+app.get("/api/elders/:id/priests/:prstAdminSortName", (req, res) => {
   const elderId = parseInt(req.params.id);
   const prstAdminSortName = req.params.prstAdminSortName;
   const elder = ElderShip.find(elder => elder.id === elderId);
@@ -49,7 +49,7 @@ app.get("/elders/:id/priests/:prstAdminSortName", (req, res) => {
   res.json(priest);
 });
 
-app.get("/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res) => {
+app.get("/api/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res) => {
   const elderId = parseInt(req.params.id);
   const prstAdminSortName = req.params.prstAdminSortName;
   const familyName = req.params.familyName;
@@ -68,7 +68,7 @@ app.get("/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res
   res.json(family);
 });
 
-app.get("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
+app.get("/api/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
   const elderId = parseInt(req.params.id);
   const prstAdminSortName = req.params.prstAdminSortName;
   const familyName = req.params.familyName;
@@ -92,33 +92,45 @@ app.get("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UI
   res.json(member);
 });
 
-app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
-  const elderId = parseInt(req.params.id);
-  const prstAdminSortName = req.params.prstAdminSortName;
-  const familyName = req.params.familyName;
-  const UID = req.params.UID;
-  const updatedData = req.body;
-  const elder = ElderShip.find(elder => elder.id === elderId);
-  if (!elder) {
-    return res.status(404).json({ message: "Elder data was not found" });
+app.put("/api/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
+  try {
+    const elderId = parseInt(req.params.id);
+    const prstAdminSortName = req.params.prstAdminSortName;
+    const familyName = req.params.familyName;
+    const UID = req.params.UID;
+    const updatedData = req.body;
+
+    const elder = ElderShip.find(elder => elder.id === elderId);
+    if (!elder) {
+      return res.status(404).json({ message: "Elder data was not found" });
+    }
+
+    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+    if (!priest) {
+      return res.status(404).json({ message: "Priest data was not found" });
+    }
+
+    const family = priest.families.find(family => family.name === familyName);
+    if (!family) {
+      return res.status(404).json({ message: "Family data was not found" });
+    }
+
+    const member = family.members.find(member => member.UID === UID);
+    if (!member) {
+      return res.status(404).json({ message: "Member data was not found" });
+    }
+
+    // Update the member data
+    Object.assign(member, updatedData);
+
+    // Save the updated data back to the file
+    saveData({ ElderShip });
+
+    res.json(member);
+  } catch (error) {
+    console.error("Error updating member:", error);
+    res.status(500).json({ message: "An error occurred while updating the member data." });
   }
-  const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
-  if (!priest) {
-    return res.status(404).json({ message: "Priest data was not found" });
-  }
-  const family = priest.families.find(family => family.name === familyName);
-  if (!family) {
-    return res.status(404).json({ message: "Family data was not found" });
-  }
-  const member = family.members.find(member => member.UID === UID);
-  if (!member) {
-    return res.status(404).json({ message: "Member data was not found" });
-  }
-  // Update the member data
-  Object.assign(member, updatedData);
-  // Save the updated data back to the file
-  saveData({ ElderShip });
-  res.json(member);
 });
 
 app.get("/", (req, res) => {
