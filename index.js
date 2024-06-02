@@ -57257,6 +57257,60 @@ app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UI
   }
 });
 
+app.put("/elders/:id/priests/:prstAdminSortName/families", (req, res) => {
+  try {
+    const elderId = parseInt(req.params.id);
+    const prstAdminSortName = req.params.prstAdminSortName;
+    const newFamilyData = req.body;
+
+    const elder = ElderShip.find(elder => elder.id === elderId);
+    if (!elder) {
+      return res.status(404).json({ message: "Elder data was not found" });
+    }
+
+    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+    if (!priest) {
+      return res.status(404).json({ message: "Priest data was not found" });
+    }
+
+    priest.families.push(newFamilyData);
+
+    res.json(newFamilyData);
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while adding the family data." });
+  }
+});
+
+app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members", (req, res) => {
+  try {
+    const elderId = parseInt(req.params.id);
+    const prstAdminSortName = req.params.prstAdminSortName;
+    const familyName = req.params.familyName;
+    const newMemberData = req.body;
+
+    const elder = ElderShip.find(elder => elder.id === elderId);
+    if (!elder) {
+      return res.status(404).json({ message: "Elder data was not found" });
+    }
+
+    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+    if (!priest) {
+      return res.status(404).json({ message: "Priest data was not found" });
+    }
+
+    const family = priest.families.find(family => family.name === familyName);
+    if (!family) {
+      return res.status(404).json({ message: "Family data was not found" });
+    }
+
+    family.members.push(newMemberData);
+
+    res.json(newMemberData);
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while adding the member data." });
+  }
+});
+
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
