@@ -57311,6 +57311,71 @@ app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members", (
   }
 });
 
+app.delete("/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res) => {
+  try {
+    const elderId = parseInt(req.params.id);
+    const prstAdminSortName = req.params.prstAdminSortName;
+    const familyName = req.params.familyName;
+
+    const elder = ElderShip.find(elder => elder.id === elderId);
+    if (!elder) {
+      return res.status(404).json({ message: "Elder data was not found" });
+    }
+
+    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+    if (!priest) {
+      return res.status(404).json({ message: "Priest data was not found" });
+    }
+
+    const familyIndex = priest.families.findIndex(family => family.name === familyName);
+    if (familyIndex === -1) {
+      return res.status(404).json({ message: "Family data was not found" });
+    }
+
+    priest.families.splice(familyIndex, 1);
+
+    res.json({ message: "Family deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while deleting the family data." });
+  }
+});
+
+app.delete("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
+  try {
+    const elderId = parseInt(req.params.id);
+    const prstAdminSortName = req.params.prstAdminSortName;
+    const familyName = req.params.familyName;
+    const UID = req.params.UID;
+
+    const elder = ElderShip.find(elder => elder.id === elderId);
+    if (!elder) {
+      return res.status(404).json({ message: "Elder data was not found" });
+    }
+
+    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+    if (!priest) {
+      return res.status(404).json({ message: "Priest data was not found" });
+    }
+
+    const family = priest.families.find(family => family.name === familyName);
+    if (!family) {
+      return res.status(404).json({ message: "Family data was not found" });
+    }
+
+    const memberIndex = family.members.findIndex(member => member.UID === UID);
+    if (memberIndex === -1) {
+      return res.status(404).json({ message: "Member data was not found" });
+    }
+
+    family.members.splice(memberIndex, 1);
+
+    res.json({ message: "Member deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while deleting the member data." });
+  }
+});
+
+
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
