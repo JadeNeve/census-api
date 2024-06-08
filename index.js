@@ -8,7 +8,7 @@ app.use(express.json());
 let ElderShip = [
   {
     "id": 1,
-    "name": "Lottering, D ELD",
+    "name": "Lottering",
     "OverseerShip": "Overseer Norman",
     "RsdntCongrName": "Portland",
     "priests": [
@@ -7424,7 +7424,7 @@ let ElderShip = [
   },
   {
     "id": 2,
-    "name": "Petersen, JM ELD",
+    "name": "Petersen",
     "OverseerShip": "Overseer Norman",
     "RsdntCongrName": "Rocklands",
     "priests": [
@@ -21011,7 +21011,7 @@ let ElderShip = [
   },
   {
     "id": 3,
-    "name": "Swartz, CA ELD",
+    "name": "Swartz",
     "OverseerShip": "Overseer Norman",
     "RsdntCongrName": "Strandfontein",
     "priests": [
@@ -28997,7 +28997,7 @@ let ElderShip = [
   },
   {
     "id": 4,
-    "name": "Koen, RD ELD",
+    "name": "Koen",
     "OverseerShip": "Overseer Norman",
     "RsdntCongrName": "Westridge",
     "priests": [
@@ -36861,7 +36861,7 @@ let ElderShip = [
   },
   {
     "id": 5,
-    "name": "Elie, EM ELD",
+    "name": "Elie",
     "OverseerShip": "Overseer Norman",
     "RsdntCongrName": "Woodlands",
     "priests": [
@@ -47510,7 +47510,7 @@ let ElderShip = [
   },
   {
     "id": 6,
-    "name": "Davids, MR ELD",
+    "name": "Davids",
     "OverseerShip": "Overseer Norman",
     "RsdntCongrName": "Colorado",
     "priests": [
