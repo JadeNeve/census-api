@@ -57311,6 +57311,37 @@ app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members", (
   }
 });
 
+// New endpoint to update family address
+app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res) => {
+  try {
+    const elderId = parseInt(req.params.id);
+    const prstAdminSortName = req.params.prstAdminSortName;
+    const familyName = req.params.familyName;
+    const updatedData = req.body;
+
+    const elder = ElderShip.find(elder => elder.id === elderId);
+    if (!elder) {
+      return res.status(404).json({ message: "Elder data was not found" });
+    }
+
+    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+    if (!priest) {
+      return res.status(404).json({ message: "Priest data was not found" });
+    }
+
+    const family = priest.families.find(family => family.name === familyName);
+    if (!family) {
+      return res.status(404).json({ message: "Family data was not found" });
+    }
+
+    // Update the family address
+    family.MemAddress = updatedData.MemAddress;
+    res.json(family);
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while updating the family address." });
+  }
+});
+
 app.delete("/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res) => {
   try {
     const elderId = parseInt(req.params.id);
@@ -57374,7 +57405,6 @@ app.delete("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/
     res.status(500).json({ message: "An error occurred while deleting the member data." });
   }
 });
-
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
