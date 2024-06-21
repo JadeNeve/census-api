@@ -57257,6 +57257,84 @@ app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UI
   }
 });
 
+app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName/members/:UID", (req, res) => {
+  try {
+    const elderId = parseInt(req.params.id);
+    const prstAdminSortName = req.params.prstAdminSortName;
+    const familyName = req.params.familyName;
+    const UID = req.params.UID;
+    const updatedData = req.body;
+
+    console.log("Updating member data for elderId:", elderId, "prstAdminSortName:", prstAdminSortName, "familyName:", familyName, "UID:", UID);
+    console.log("Updated data:", updatedData);
+
+    const elder = ElderShip.find(elder => elder.id === elderId);
+    if (!elder) {
+      console.error("Elder not found");
+      return res.status(404).json({ message: "Elder data was not found" });
+    }
+
+    const priest = elder.priests.find(priest => priest.prstAdminSortName === prstAdminSortName);
+    if (!priest) {
+      console.error("Priest not found");
+      return res.status(404).json({ message: "Priest data was not found" });
+    }
+
+    const family = priest.families.find(family => family.name === familyName);
+    if (!family) {
+      console.error("Family not found");
+      return res.status(404).json({ message: "Family data was not found" });
+    }
+
+    const member = family.members.find(member => member.UID === UID);
+    if (!member) {
+      console.error("Member not found");
+      return res.status(404).json({ message: "Member data was not found" });
+    }
+
+    // Check if eldership or priestship has changed
+    if (updatedData.elderId !== elderId || updatedData.prstAdminSortName !== prstAdminSortName) {
+      // Remove member from current family visiting point
+      family.members = family.members.filter(m => m.UID !== UID);
+
+      // Find new elder
+      const newElder = ElderShip.find(elder => elder.id === parseInt(updatedData.elderId));
+      if (!newElder) {
+        return res.status(404).json({ message: "New elder data was not found" });
+      }
+
+      // Find new priest
+      const newPriest = newElder.priests.find(priest => priest.prstAdminSortName === updatedData.prstAdminSortName);
+      if (!newPriest) {
+        return res.status(404).json({ message: "New priest data was not found" });
+      }
+
+      // Check if the family exists in the new priestship
+      let newFamily = newPriest.families.find(family => family.name === familyName);
+      if (!newFamily) {
+        // If family doesn't exist, create a new one
+        newFamily = { name: familyName, members: [] };
+        newPriest.families.push(newFamily);
+      }
+
+      // Add the member to the new family
+      newFamily.members.push(updatedData);
+    } else {
+      // Update the member in the same family visiting point
+      Object.assign(member, updatedData);
+    }
+
+    // Save the updated data back to the embedded structure (this will not persist across server restarts)
+    ElderShip = ElderShip.map(el => el.id === elderId ? { ...el, priests: el.priests.map(pr => pr.prstAdminSortName === prstAdminSortName ? { ...pr, families: pr.families.map(fam => fam.name === familyName ? { ...fam, members: fam.members.map(m => m.UID === UID ? member : m) } : fam) } : pr) } : el);
+
+    res.json(updatedData);
+  } catch (error) {
+    console.error("Error updating member:", error);
+    res.status(500).json({ message: "An error occurred while updating the member data." });
+  }
+});
+
+
 app.put("/elders/:id/priests/:prstAdminSortName/families", (req, res) => {
   try {
     const elderId = parseInt(req.params.id);
