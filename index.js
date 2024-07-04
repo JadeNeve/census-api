@@ -57414,11 +57414,13 @@ app.put("/elders/:id/priests/:prstAdminSortName/families/:familyName", (req, res
       return res.status(404).json({ message: "Family data was not found" });
     }
 
-    // Update the family address
-    family.MemAddress = updatedData.MemAddress;
+    // Update the family address or other details
+    Object.assign(family, updatedData);
+
     res.json(family);
   } catch (error) {
-    res.status(500).json({ message: "An error occurred while updating the family address." });
+    console.error("Error updating family:", error);
+    res.status(500).json({ message: "An error occurred while updating the family data." });
   }
 });
 
